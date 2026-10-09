@@ -1,6 +1,7 @@
 package io.github.techtastic.ntm_vehicles;
 
-import mcinterface1122.WrapperWorld;
+import com.thomass47.immersivevehicleslegacy.mcinterface1710.WrapperWorld;
+import minecrafttransportsimulator.mcinterface.AWrapperWorld;
 import minecrafttransportsimulator.jsondefs.JSONBullet;
 import minecrafttransportsimulator.jsondefs.JSONVariableModifier;
 import net.minecraft.world.World;
@@ -8,14 +9,27 @@ import net.minecraft.world.World;
 import java.lang.reflect.Field;
 
 public class Util {
-    public static World getWorld(WrapperWorld world) {
+    private static final Field WORLD_FIELD = findWorldField();
+
+    private static Field findWorldField() {
         try {
-            Class<WrapperWorld> clazz = WrapperWorld.class;
-            Field field = clazz.getDeclaredField("world");
+            Field field = WrapperWorld.class.getDeclaredField("world");
             field.setAccessible(true);
-            return (World) field.get(world);
-        } catch (Exception ignored) {}
-        return null;
+            return field;
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Cannot access the IVL world bridge", exception);
+        }
+    }
+
+    public static World getWorld(AWrapperWorld world) {
+        if (!(world instanceof WrapperWorld)) {
+            throw new IllegalArgumentException("NTM: Vehicles requires an IVL world wrapper");
+        }
+        try {
+            return (World) WORLD_FIELD.get(world);
+        } catch (IllegalAccessException exception) {
+            throw new IllegalStateException("Cannot unwrap the IVL world", exception);
+        }
     }
 
     public static JSONVariableModifier getVariableModifier(JSONBullet definition, String name) {

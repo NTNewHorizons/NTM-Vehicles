@@ -45,7 +45,7 @@ if (propertyBool('publish_to_curseforge')) {
             id = propertyString('curseforge_project_id')
             addGameVersion 'Java 8'
             addGameVersion 'Forge'
-            addGameVersion '1.12.2'
+            addGameVersion '1.7.10'
             releaseType = propertyString('release_type')
             if (!propertyBool('publish_with_changelog')) {
                 changelog = parserChangelog()
@@ -83,7 +83,7 @@ if (propertyBool('publish_to_modrinth')) {
         versionNumber = propertyString('mod_version')
         versionType = propertyString('release_type')
         uploadFile = tasks.reobfJar
-        gameVersions = ['1.12.2']
+        gameVersions = ['1.7.10']
         loaders = ['forge']
         debugMode = propertyBool('modrinth_debug')
         if (propertyBool('use_mixins') || propertyBool('use_asset_mover')) {
