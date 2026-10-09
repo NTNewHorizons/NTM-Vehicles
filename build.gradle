@@ -27,18 +27,33 @@ repositories {
     mavenCentral()
     maven { url 'https://maven.minecraftforge.net/' }
     maven { url 'https://nexus.gtnewhorizons.com/repository/public/' }
+    maven {
+        url 'https://maven.ntmr.dev/releases/'
+        content { includeGroup 'com.hbm' }
+    }
 }
 
-// Use the user's actual 1.7.10 builds, never the bundled upstream 1.12.2 jar.
-// Override with -PivlJar=/path/to/ivl-dev.jar -PntmJar=/path/to/ntm-dev.jar.
+// Build the pinned, dispatcher-patched IVL revision unless explicitly overridden.
 def ivlJar = file(providers.gradleProperty('ivlJar').getOrElse(
-    '../IVL/build/libs/immersivevehicleslegacy-0.1.0-dev-dev.jar'))
-def ntmJar = file(providers.gradleProperty('ntmJar').getOrElse(
-    '../Hbm-s-Nuclear-Tech-GIT/build/libs/HBM-NTM-[1.0.27_X5808]-dev.jar'))
+    '.dependencies/IVL/build/libs/immersivevehicleslegacy-0.1.0-ntmv1-dev.jar'))
+def ntmJar = providers.gradleProperty('ntmJar')
+
+tasks.register('prepareIvl', Exec) {
+    onlyIf { !providers.gradleProperty('ivlJar').isPresent() }
+    inputs.files('scripts/prepare-dependencies.sh', 'patches/ivl-custom-hit-once.patch')
+    outputs.file(ivlJar)
+    outputs.file('.dependencies/IVL/build/libs/immersivevehicleslegacy-0.1.0-ntmv1.jar')
+    commandLine 'bash', file('scripts/prepare-dependencies.sh')
+}
 
 dependencies {
-    implementation files(ivlJar, ntmJar)
-    // Support the local dev jars without embedding their dependencies in the bridge.
+    implementation files(ivlJar).builtBy(tasks.named('prepareIvl'))
+    if (ntmJar.isPresent()) {
+        implementation files(file(ntmJar.get()))
+    } else {
+        implementation('com.hbm:HBM-NTM:1.0.27_X5808:dev') { transitive = false }
+    }
+    // Runtime support without embedding either mod in the bridge.
     runtimeOnly 'com.googlecode.soundlibs:jlayer:1.0.1.4'
     runtimeOnly 'org.jcraft:jorbis:0.0.17'
     runtimeOnly('com.github.GTNewHorizons:NotEnoughItems:2.8.158-GTNH:dev') { transitive = false }
@@ -48,9 +63,12 @@ dependencies {
 }
 
 tasks.register('verifyLocalDependencies') {
-    inputs.files(ivlJar, ntmJar)
+    dependsOn 'prepareIvl'
+    inputs.file(ivlJar)
     doLast {
-        [ivlJar, ntmJar].each { dependency ->
+        def localJars = [ivlJar]
+        if (ntmJar.isPresent()) { localJars.add(file(ntmJar.get())) }
+        localJars.each { dependency ->
             if (!dependency.isFile()) {
                 throw new GradleException("Missing development dependency: ${dependency}. See README.md for build instructions.")
             }
@@ -80,6 +98,20 @@ tasks.named('injectTags') {
 
 publishing {
     publications {
-        mavenJava(MavenPublication) { from components.java }
+        mavenJava(MavenPublication) {
+            artifactId = mod_id
+            artifact(tasks.named('reobfJar'))
+            artifact(tasks.named('sourcesJar'))
+        }
+    }
+}
+
+apply from: 'gradle/scripts/publishing.gradle'
+
+tasks.named('publish') {
+    doFirst {
+        if (publishing.repositories.isEmpty()) {
+            throw new GradleException('No Maven destination. Set -Ppublish_to_maven=true -Pmaven_url=... or use publishToMavenLocal.')
+        }
     }
 }

@@ -9,7 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 @Mod(modid = Tags.MOD_ID, name = Tags.MOD_NAME, version = Tags.VERSION,
-    dependencies = "required-after:immersivevehicleslegacy;required-after:hbm",
+    dependencies = "required-after:immersivevehicleslegacy@[0.1.0-ntmv1];required-after:hbm",
     acceptedMinecraftVersions = "[1.7.10]", acceptableRemoteVersions = "*")
 public class NTMVehicles {
     public static final Logger LOGGER = LogManager.getLogger(Tags.MOD_NAME);

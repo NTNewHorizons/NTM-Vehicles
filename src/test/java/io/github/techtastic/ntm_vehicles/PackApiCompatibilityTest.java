@@ -148,7 +148,7 @@ public class PackApiCompatibilityTest {
     public void forgeMetadataRequiresIvlAndNtmNotMtsOrMixinBooter() {
         Mod mod = NTMVehicles.class.getAnnotation(Mod.class);
         assertEquals("ntm_vehicles", mod.modid());
-        assertEquals("required-after:immersivevehicleslegacy;required-after:hbm", mod.dependencies());
+        assertEquals("required-after:immersivevehicleslegacy@[0.1.0-ntmv1];required-after:hbm", mod.dependencies());
         assertEquals("[1.7.10]", mod.acceptedMinecraftVersions());
     }
 
