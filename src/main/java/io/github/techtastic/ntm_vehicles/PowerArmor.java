@@ -21,9 +21,7 @@ public final class PowerArmor {
             return false;
 
         ArmorFSB suit = (ArmorFSB) chestplate;
-        // Mirror the shared CE/ExtendedEdition charge-independent full-set rules.
-        // Do not call hasFSBArmorIgnoreCharge: ExtendedEdition's EntityLivingBase
-        // descriptor differs from CE's EntityPlayer descriptor at runtime.
+        // Check locally because CE and ExtendedEdition use different helper signatures.
         for (EntityEquipmentSlot slot : EntityEquipmentSlot.values()) {
             if (slot.getSlotType() != EntityEquipmentSlot.Type.ARMOR
                     || (slot == EntityEquipmentSlot.HEAD && suit.noHelmet))
