@@ -1,25 +1,16 @@
 package io.github.techtastic.ntm_vehicles;
 
-import com.hbm.entity.effect.EntityNukeTorex;
-import com.hbm.entity.logic.EntityBomber;
 import com.hbm.entity.logic.EntityNukeExplosionMK5;
 import com.hbm.explosion.ExplosionChaos;
-import com.hbm.explosion.ExplosionLarge;
-import com.hbm.lib.HBMSoundHandler;
 import io.github.techtastic.ntm_vehicles.ntm_vehicles.Tags;
 import mcinterface1122.WrapperWorld;
 import minecrafttransportsimulator.entities.instances.EntityBullet;
-import minecrafttransportsimulator.jsondefs.JSONVariableModifier;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.lang.reflect.Field;
 
 @Mod(modid = Tags.MOD_ID, name = Tags.MOD_NAME, version = Tags.VERSION, dependencies = "required-after:mts@[22.18.0,);required-after:hbm;required-after:mixinbooter", acceptableRemoteVersions = "*")
 public class NTMVehicles {
@@ -33,6 +24,7 @@ public class NTMVehicles {
      */
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
+        NTMCompatibility compatibility = new NTMCompatibility();
         EntityBullet.registerCustomHitFunction("ntm_vehicles:nuke", (world, pos, side, type, bullet) -> {
             World actualWorld = Util.getWorld((WrapperWorld) world);
 
@@ -40,7 +32,7 @@ public class NTMVehicles {
                 return;
 
             actualWorld.spawnEntity(EntityNukeExplosionMK5.statFac(actualWorld, (int) Util.getBlastSize(bullet.definition), pos.x, pos.y, pos.z));
-            EntityNukeTorex.statFac(actualWorld, pos.x, pos.y, pos.z, (int) Util.getBlastSize(bullet.definition));
+            compatibility.spawnTorex(actualWorld, pos.x, pos.y, pos.z, (int) Util.getBlastSize(bullet.definition));
         });
 
         EntityBullet.registerCustomHitFunction("ntm_vehicles:gas", (world, pos, side, type, bullet) -> {
@@ -60,14 +52,7 @@ public class NTMVehicles {
             if (actualWorld == null)
                 return;
 
-            //actualWorld.spawnEntity(EntityBomber.statFacNapalm(actualWorld, pos.x, pos.y, pos.z));
-
-            ExplosionLarge.explode(actualWorld, pos.x, pos.y, pos.z, 2.5f, false, false, false);
-            ExplosionChaos.burn(actualWorld, new BlockPos(pos.x, pos.y, pos.z), 9);
-            ExplosionChaos.flameDeath(actualWorld, new BlockPos(pos.x, pos.y, pos.z), 14);
-
-            for(int i = 0; i < 5; i++)
-                ExplosionLarge.spawnBurst(actualWorld, pos.x, pos.y + 1, pos.z, actualWorld.rand.nextInt(10) + 15, actualWorld.rand.nextFloat() * 2 + 2);
+            compatibility.spawnNapalm(actualWorld, pos.x, pos.y, pos.z);
         });
     }
 }

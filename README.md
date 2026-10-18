@@ -5,11 +5,11 @@ Integration based on [TechTastic's NTM: Vehicles](https://github.com/TechTastic/
 Requires Immersive Vehicles (MTS) 22.18.0 or later, NTM (`hbm`), and MixinBooter
 for Minecraft 1.12.2.
 
-Power-armour detection supports either NTM
+The custom bullet effects and power-armour detection support either NTM
 [Community Edition (CE)](https://github.com/Warfactory-Official/Hbm-s-Nuclear-Tech-CE)
 or [ExtendedEdition](https://github.com/Alcatergit/Hbm-s-Nuclear-Tech-GIT)
 installed alongside MTS. These are alternative NTM installations, not mods to
-install together; the same bridge and pack variable work with either fork.
+install together; the same bridge and pack API work with either fork.
 
 ## Build
 
@@ -19,7 +19,7 @@ install together; the same bridge and pack variable work with either fork.
 
 Pinned development dependencies:
 
-- NTM `curse.maven:ntm-708939:7117833` from `https://cursemaven.com/`
+- NTM ExtendedEdition `curse.maven:ntm-708939:7117833` from `https://cursemaven.com/`
 - MTS `com.example:Immersive Vehicles-1.12.2:22.18.0`, supplied by
   `libs/Immersive Vehicles-1.12.2-22.18.0.jar`
 - MixinBooter `zone.rong:mixinbooter:10.2` from `https://maven.cleanroommc.com/`
@@ -35,6 +35,10 @@ animations and server-side conditions.
 ### Custom bullet effects
 
 Existing `CUSTOM` bullet functions:
+
+The bridge selects CE or ExtendedEdition effect signatures at startup.
+CE uses the standard Torex cloud type and an unattributed detonator, preserving
+the original effects without requiring separate bridge builds.
 
 | Function | Behavior |
 | --- | --- |
