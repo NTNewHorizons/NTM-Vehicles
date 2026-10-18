@@ -13,6 +13,10 @@ install together; the same bridge and pack API work with either fork.
 
 ## Build
 
+Run Gradle with JDK 25 (`JAVA_HOME` must point to it). The build uses
+RetroFuturaGradle 2.0.6 and Gradle 9.7.1; Minecraft and mod classes still target
+Java 8 using an automatically provisioned toolchain.
+
 ```sh
 ./gradlew build
 ```
